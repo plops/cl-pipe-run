@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 #define len(x) (sizeof(x)/sizeof(x[0]))
 
@@ -22,23 +23,24 @@ fub fun b
 fub .d3s0
 EOF
 */
-int
-fun(int a)
+double
+fun(double a)
 {
   return a+a;
 }
 
-int
-fub(int a)
+double
+fub(double a)
 {
   return 3*a;
 }
 
 struct{
   char name[CMDLEN];
-  int (*fptr)();
-}cmd[]={{"fun",fun},
-	{"fub",fub}};
+  int args;
+  double (*fptr)();
+}cmd[]={{"fun",1,fun},
+	{"fub",1,fub}};
 
 int
 lookup(char*s)
@@ -58,36 +60,77 @@ int isfloatchar(int c)
 }
 
 int
+parse_name(char*tok)
+{
+  int fun_index=-1;
+  if(tok){
+    if(isalpha(tok[0])){
+      fun_index=lookup(tok);
+      printf("+%s=%d+\n",tok,fun_index);
+    }else{
+      printf("error, expected function name\n");
+      return -1;
+    }
+  }else{
+    printf("error, expected some function name but got nothing");
+    return -1;
+  }
+  return fun_index;
+}
+
+ 
+
+double
+parse_line(char*line)
+{
+  char *search=" ",*tok;
+  if(!line)
+    return FP_NAN;
+  tok=strtok(line,search);
+
+  int fun_index=parse_name(tok);
+  if(fun_index<0)
+    return FP_NAN;
+
+  int arg_num=cmd[fun_index].args;
+  int i;
+  double d;
+  for(i=0;i<arg_num;i++){
+    tok=strtok(0,search);
+    if(!tok){
+      printf("error, expected an argument");
+      return FP_NAN;
+    }
+    if(isfloatchar(tok[0])){
+	char*endptr;
+	d=strtod(tok,&endptr);
+	if(endptr==tok){
+	  printf("error, couldn't parse double\n");
+	  return FP_NAN;
+	}else
+	  printf("%g\n",d);
+    }else{
+      printf("error, expected digit or .+- but found %c\n",tok[0]);
+      return FP_NAN;
+    }   
+  }
+  return cmd[fun_index].fptr(d);
+}
+
+int
 main()
 {
+  FILE*f=fopen("/dev/shm/log","w");
+  printf("begin:\n");
+  fprintf(f,"begin\n");
   char s[CMDLEN],*line;
   do{
     line=fgets(s,sizeof(s),stdin);
-    char *search=" ",*tok;
-    if(line){
-      tok=strtok(line,search);
-      int i=0;
-      while(tok!=0){
-	if(i==0)
-	  if(isalpha(tok[0]))
-	    printf("+%s=%d+\n",tok,lookup(tok));
-	  else
-	    printf("error, expected function name\n");
-	else
-	  if(isfloatchar(tok[0])){
-	    char*endptr;
-	    double d=strtod(tok,&endptr);
-	    if(endptr==tok)
-	      printf("error, couldn't parse double\n");
-	    else
-	      printf("+%s=%g+\n",tok,d);
-	  }else
-	    printf("error, expected digit or .+- but found %c\n",tok[0]);
-	tok=strtok(0,search);
-	i++;
-      }
-      printf("\n");
-    }    
+    double d=parse_line(line);
+    printf("apply %g\n", d);
+    fprintf(f,"apply %g\n",d);
+    fflush(f);
   }while(line);
+  printf("bye!\n");
   return 0;
 }
