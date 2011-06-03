@@ -4,7 +4,8 @@
 		      :output :stream
 		      :input :stream
 		      :wait nil))
-(format (sb-ext:process-input *chan*) "fun 12 31~%")
+(dotimes (i 1024)
+ (format (sb-ext:process-input *chan*) "fun ~d 31~%" i))
 (format (sb-ext:process-input *chan*) "3.2 12 31~%")
 
 (sb-ext:process-close *chan*)
