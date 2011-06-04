@@ -30,9 +30,10 @@ fun(double a)
 }
 
 double
-fub(double a)
+end(double a)
 {
-  return 3*a;
+  (void)a;
+  exit(0);
 }
 
 struct{
@@ -40,7 +41,7 @@ struct{
   int args;
   double (*fptr)();
 }cmd[]={{"fun",1,fun},
-	{"fub",1,fub}};
+	{"end",0,end}};
 
 int
 lookup(char*s)
