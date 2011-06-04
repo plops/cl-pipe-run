@@ -47,8 +47,11 @@ int
 lookup(char*s)
 {
   unsigned int i;
+  int n=strlen(s);
+  if(s[n-1]=='\n')
+    n--;
   for(i=0;i<len(cmd);i++)
-    if(0==strncmp(s,cmd[i].name,CMDLEN))
+    if(0==strncmp(s,cmd[i].name,n))
       return i;
   return -1;
 }
@@ -118,6 +121,8 @@ parse_line(char*line)
   return cmd[fun_index].fptr(d);
 }
 
+unsigned long long fun_num=0;
+
 int
 main()
 {
@@ -129,7 +134,7 @@ main()
     line=fgets(s,sizeof(s),stdin);
     double d=parse_line(line);
     printf("apply %g\n", d);
-    fprintf(f,"apply %g\n",d);
+    fprintf(f,"%llu apply %g\n",fun_num++,d);
     fflush(f);
   }while(line);
   printf("bye!\n");
