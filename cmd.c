@@ -134,6 +134,7 @@ main()
     line=fgets(s,sizeof(s),stdin);
     double d=parse_line(line);
     printf("apply %g\n", d);
+    fflush(stdout);
     fprintf(f,"%llu apply %g\n",fun_num++,d);
     fflush(f);
   }while(line);
