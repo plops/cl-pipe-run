@@ -7,8 +7,18 @@
 		      :wait nil))
 
 (let ((s (sb-ext:process-input *chan*)))
-  (write-line "dump 4" s)
+  (write-line "fun 4" s)
   (finish-output s))
+
+
+(let* ((s (sb-ext:process-input *chan*))
+       (e (sb-ext:process-error *chan*))
+       (n 4)
+       (buf (make-array n :element-type '(unsigned-byte 8))))
+  (write-line (format nil "get ~a" n) s)
+  (finish-output s)
+  (write-sequence buf e)
+  (finish-output e))
 
 (progn
  (defvar *dump* nil)

@@ -45,12 +45,24 @@ dump(double a)
   return a;
 }
 
+double
+get(double a)
+{
+  int i=(int)a;
+  unsigned char *buf=malloc(i);
+  printf("reading %d bytes from stderr\n",i);
+  fflush(stdout);
+  fread(buf,len(buf),1,stderr);
+  free(buf);
+}
+
 struct{
   char name[CMDLEN];
   int args;
   double (*fptr)();
 }cmd[]={{"fun",1,fun},
 	{"dump",1,dump},
+	{"get",1,get},
 	{"end",0,end}};
 
 int
