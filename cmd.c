@@ -36,11 +36,21 @@ end(double a)
   exit(0);
 }
 
+double
+dump(double a)
+{
+  int q=((int)a)%200;
+  unsigned char buf[]={q+1,q+2,q+3,q+4};
+  fwrite(buf,len(buf),1,stderr);
+  return a;
+}
+
 struct{
   char name[CMDLEN];
   int args;
   double (*fptr)();
 }cmd[]={{"fun",1,fun},
+	{"dump",1,dump},
 	{"end",0,end}};
 
 int
