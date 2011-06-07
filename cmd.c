@@ -7,7 +7,7 @@
 #include <math.h>
 
 #define len(x) (sizeof(x)/sizeof(x[0]))
-
+FILE*binary_fifo;
 enum{CMDLEN=100};
 
 // string containing function name
@@ -51,9 +51,12 @@ get(double a)
   int i=(int)a;
   unsigned char *buf=malloc(i);
   printf("reading %d bytes from stderr\n",i);
+
+  fread(buf,len(buf),1,binary_fifo);
+  printf("0x%x\n",buf[0]);
   fflush(stdout);
-  fread(buf,len(buf),1,stderr);
   free(buf);
+  return 0.0;
 }
 
 struct{
@@ -149,6 +152,7 @@ int
 main()
 {
   FILE*f=fopen("/dev/shm/log","w");
+  binary_fifo=fopen("binary","r");
   printf("begin:\n");
   fprintf(f,"begin\n");
   char s[CMDLEN],*line;
