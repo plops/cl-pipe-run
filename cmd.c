@@ -33,6 +33,7 @@ double
 end(double a)
 {
   (void)a;
+  printf("bye!\n");
   exit(0);
 }
 
@@ -46,13 +47,17 @@ dump(double a)
 }
 
 double
-get(double a)
+load(double a)
 {
   int i=(int)a;
   unsigned char *buf=malloc(i);
   printf("reading %d bytes from stderr\n",i);
 
-  fread(buf,len(buf),1,binary_fifo);
+  fread(buf,i,1,binary_fifo);
+  FILE*f=fopen("/dev/shm/o.pgm","w");
+  fprintf(f,"P5\n256 256\n255\n");
+  fwrite(buf,i,1,f);
+  fclose(f);
   printf("0x%x\n",buf[0]);
   fflush(stdout);
   free(buf);
@@ -65,7 +70,7 @@ struct{
   double (*fptr)();
 }cmd[]={{"fun",1,fun},
 	{"dump",1,dump},
-	{"get",1,get},
+	{"load",1,load},
 	{"end",0,end}};
 
 int
